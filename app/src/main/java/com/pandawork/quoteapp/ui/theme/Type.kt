@@ -1,6 +1,5 @@
 package com.pandawork.quoteapp.ui.theme
 
-import android.R.attr.fontFamily
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -42,8 +41,8 @@ val Typography = Typography(
     ),
     bodyLarge = TextStyle(
         fontFamily = nunito,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     )
