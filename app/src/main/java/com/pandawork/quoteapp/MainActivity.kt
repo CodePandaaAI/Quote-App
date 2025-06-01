@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,55 +50,58 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun QuoteScreen(viewModel: QuoteViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
-        topBar = { TopAppBar() }) { innerPadding ->
+        topBar = { TopAppBar() /* Implement your TopAppBar */ }) { innerPadding ->
         Column(
             Modifier
-                .padding(vertical = 24.dp, horizontal = 16.dp)
+                .padding(innerPadding)
                 .fillMaxSize()
+                .padding(vertical = 24.dp, horizontal = 24.dp)
         ) {
             Card(
                 Modifier
-                    .fillMaxWidth()
-                    .height(700.dp)
-                    .padding(innerPadding),
+                    .weight(1f)
+                    .fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 40.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-
-                    ) {
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Image(
                         painter = painterResource(uiState.image),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(280.dp)
+                            .size(285.dp)
                             .clip(MaterialTheme.shapes.medium)
                     )
+                    Spacer(Modifier.height(40.dp))
                     Text(
                         uiState.quote,
-                        modifier = Modifier
-                            .padding(vertical = 24.dp, horizontal = 12.dp),
-                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
             }
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(24.dp))
             Row(
                 Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                Button(onClick = {
-                    viewModel.updateQuoteAndImage()
-                }
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = {
+                        viewModel.previousQuote()
+                    },
+                    enabled = uiState.canGoPrevious
                 ) {
                     Text(text = "Previous Quote")
                 }
                 Button(onClick = {
-                    viewModel.updateQuoteAndImage()
+                    viewModel.nextQuote()
                 }
                 ) {
                     Text(text = "Next Quote")
