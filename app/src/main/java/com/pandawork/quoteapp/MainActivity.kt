@@ -2,6 +2,7 @@ package com.pandawork.quoteapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
@@ -14,7 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,7 +44,12 @@ import com.pandawork.quoteapp.ui.theme.QuoteAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            )
+        )
         setContent {
             QuoteAppTheme {
                 QuoteScreen()
@@ -49,86 +58,107 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuoteScreen(viewModel: QuoteViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
-        topBar = { TopAppBar() }) { innerPadding ->
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Quotes✨",
+                        style = MaterialTheme.typography.displayLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            )
+        }
+    ) { innerPadding ->
         Column(
-            Modifier
-                .padding(innerPadding)
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 24.dp, horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Display Image and Quote
             Card(
-                Modifier
+                modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(32.dp),
+                shape = RoundedCornerShape(16.dp),
             ) {
                 Column(
-                    Modifier
+                    modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 40.dp),
+                        .padding(horizontal = 16.dp, vertical = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
                     Image(
                         painter = painterResource(uiState.image),
-                        contentDescription = null,
+                        contentDescription = "Quote illustration",
+                        alignment = Alignment.Center,
                         modifier = Modifier
                             .size(285.dp)
-                            .clip(RoundedCornerShape(topStart = 96.dp, topEnd = 96.dp, bottomEnd = 20.dp, bottomStart = 20.dp))
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 64.dp,
+                                    topEnd = 64.dp,
+                                    bottomEnd = 16.dp,
+                                    bottomStart = 16.dp
+                                )
+                            )
                     )
-                    Spacer(Modifier.height(40.dp))
+
+                    Spacer(Modifier.height(16.dp))
+
                     Text(
-                        uiState.quote,
+                        text = uiState.quote,
                         style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     )
                 }
             }
+
             Spacer(Modifier.height(24.dp))
+            
+            // Navigation Buttons
             Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = {
-                        viewModel.previousQuote()
-                    },
-                    enabled = uiState.canGoPrevious
+                    onClick = { viewModel.previousQuote() },
+                    enabled = uiState.canGoPrevious,
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Text(text = "Previous Quote",
-                        color = if(uiState.canGoPrevious) MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    Text(
+                        text = "Previous"
                     )
                 }
-                Button(onClick = {
-                    viewModel.nextQuote()
-                }
+
+                Spacer(Modifier.width(16.dp))
+
+                Button(
+                    onClick = { viewModel.nextQuote() },
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Text(text = "Next Quote")
+                    Text(
+                        text = "Next"
+                    )
                 }
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBar() {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                "Quotes✨",
-                style = MaterialTheme.typography.displayLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    )
 }
 
 @Preview
